@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Basic Three.js App</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/102/three.min.js"></script>
+    <script src="StereoEffect.js"></script>
+    <script src="DeviceOrientationControls.js"></script>
+    <script>
+      // Javascript will go here.
+
+      let effect;
+      let controls;
+      var raycaster = new THREE.Raycaster();
+      var mouse = new THREE.Vector2();
+      var scene = new THREE.Scene();
+      var aspect = window.innerWidth / window.innerHeight;
+      var camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000 );
+      
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+
+      var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      var material = new THREE.MeshNormalMaterial();
+      var cube = new THREE.Mesh( geometry, material );
+      cube.name = "b1";
+      var t = 0;
+      scene.add( cube );
+      camera.position.z = 5;
+
+      effect = new THREE.StereoEffect( renderer );
+			effect.setSize( window.innerWidth, window.innerHeight );
+
+      controls = new THREE.DeviceOrientationControls( camera );
+      
+      function onMouseMove( event ) {
+
+      // calculate mouse position in normalized device coordinates
+      // (-1 to +1) for both components
+
+      mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+      mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+      }
+
+      var render = function () {
+        requestAnimationFrame( render );
+        raycaster.setFromCamera( mouse, camera );
+
+        // calculate objects intersecting the picking ray
+        var intersects = raycaster.intersectObjects( scene.children);
+
+        if(intersects.length>0) {
+          if(intersects[0].object.name=="b1")
+          {
+            if(t > 180)
+            {
+              cube.rotation.x += 0.1;
+              cube.rotation.y += 0.1;
+            }
+            t++;
+          }   
+        }else{t=0;}
+
+        //controls.update();
+        renderer.render( scene, camera );
+        //effect.render( scene, camera );
+        t++;
+      };
+      window.addEventListener( 'mousemove', onMouseMove, false );
+      render();
+
+
+    </script>
+  </body>
+</html>
